@@ -25,9 +25,5 @@ jobs:
       - run: cargo fmt --check
       - run: cargo clippy --all-targets --all-features -- -D warnings
       - run: cargo test --all
-      - if: runner.os == 'Windows'
-        shell: pwsh
-        run: ./scripts/check-read-only-boundary.ps1
-      - if: runner.os != 'Windows'
-        shell: bash
-        run: ./scripts/check-read-only-boundary.sh
+      - shell: bash
+        run: bash ./scripts/check-read-only-boundary.sh

@@ -1,38 +1,35 @@
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$sourceRoot = Join-Path $repoRoot 'crates'
 $violations = [System.Collections.Generic.List[string]]::new()
 
-$processLaunches = & rg -n 'Command::new' $sourceRoot -g '*.rs'
+$processLaunches = & git -C $repoRoot grep -n -E 'Command::new' -- ':(glob)crates/**/*.rs'
 foreach ($line in $processLaunches) {
     if ($line -notmatch 'rsi-probe[\\/]+src[\\/]+runner\.rs') {
         $violations.Add("process boundary: $line")
     }
 }
 
-$manifest = Join-Path $repoRoot 'crates/rsi-probe/src/manifest.rs'
-$shellFlags = & rg -n '"(?:-c|/C|-Command|--command)"' $manifest
+$shellFlags = & git -C $repoRoot grep -n -E '"(-c|/C|-Command|--command)"' -- 'crates/rsi-probe/src/manifest.rs'
 foreach ($line in $shellFlags) {
     $violations.Add("shell flag: $line")
 }
 
-$cliSource = Join-Path $repoRoot 'crates/rsi-cli/src'
-$mutationCommands = & rg -n '^\s*(Apply|Elevate|Install|Remove|Uninstall|Cleanup|Service)\b' $cliSource -g '*.rs'
+$mutationCommands = & git -C $repoRoot grep -n -E '^[[:space:]]*(Apply|Elevate|Install|Remove|Uninstall|Cleanup|Service)([[:space:]]|$)' -- ':(glob)crates/rsi-cli/src/**/*.rs'
 foreach ($line in $mutationCommands) {
     $violations.Add("mutation command: $line")
 }
 
-$legacyLayer = & rg -n 'rsi[-_]rules' $sourceRoot -g '*.rs' -g 'Cargo.toml'
+$legacyLayer = & git -C $repoRoot grep -n -E 'rsi[-_]rules' -- ':(glob)crates/**/*.rs' ':(glob)crates/**/Cargo.toml'
 foreach ($line in $legacyLayer) {
     $violations.Add("legacy optimization layer: $line")
 }
 
-$rawAnalysis = & rg -n 'analyze\(&snapshot' $sourceRoot -g '*.rs'
+$rawAnalysis = & git -C $repoRoot grep -n -E 'analyze\(&snapshot' -- ':(glob)crates/**/*.rs'
 foreach ($line in $rawAnalysis) {
     $violations.Add("unverified analysis input: $line")
 }
 
-$optimizeSource = Get-Content -Raw (Join-Path $sourceRoot 'rsi-optimize/src/lib.rs')
+$optimizeSource = Get-Content -Raw (Join-Path $repoRoot 'crates/rsi-optimize/src/lib.rs')
 if ($optimizeSource -notmatch 'pub fn analyze\(verified: &VerifiedSnapshot') {
     $violations.Add('verification type gate: rsi-optimize::analyze must require VerifiedSnapshot')
 }
