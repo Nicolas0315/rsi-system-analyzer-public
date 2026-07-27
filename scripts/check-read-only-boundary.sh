@@ -9,28 +9,35 @@ while IFS= read -r line; do
     *rsi-probe/src/runner.rs*) ;;
     *) printf 'process boundary: %s\n' "$line" >&2; violations=1 ;;
   esac
-done < <(rg -n 'Command::new' "$repo_root/crates" -g '*.rs' || true)
+done < <(
+  git -C "$repo_root" grep -n -E 'Command::new' -- \
+    ':(glob)crates/**/*.rs' || true
+)
 
-if rg -n '"(-c|/C|-Command|--command)"' \
-  "$repo_root/crates/rsi-probe/src/manifest.rs"; then
+if git -C "$repo_root" grep -n -E '"(-c|/C|-Command|--command)"' -- \
+  'crates/rsi-probe/src/manifest.rs'; then
   violations=1
 fi
 
-if rg -n '^[[:space:]]*(Apply|Elevate|Install|Remove|Uninstall|Cleanup|Service)\b' \
-  "$repo_root/crates/rsi-cli/src" -g '*.rs'; then
+if git -C "$repo_root" grep -n -E \
+  '^[[:space:]]*(Apply|Elevate|Install|Remove|Uninstall|Cleanup|Service)([[:space:]]|$)' -- \
+  ':(glob)crates/rsi-cli/src/**/*.rs'; then
   violations=1
 fi
 
-if rg -n 'rsi[-_]rules' "$repo_root/crates" -g '*.rs' -g 'Cargo.toml'; then
+if git -C "$repo_root" grep -n -E 'rsi[-_]rules' -- \
+  ':(glob)crates/**/*.rs' ':(glob)crates/**/Cargo.toml'; then
   violations=1
 fi
 
-if rg -n 'analyze\(&snapshot' "$repo_root/crates" -g '*.rs'; then
+if git -C "$repo_root" grep -n -E 'analyze\(&snapshot' -- \
+  ':(glob)crates/**/*.rs'; then
   violations=1
 fi
 
-if ! rg -q 'pub fn analyze\(verified: &VerifiedSnapshot' \
-  "$repo_root/crates/rsi-optimize/src/lib.rs"; then
+if ! git -C "$repo_root" grep -q -E \
+  'pub fn analyze\(verified: &VerifiedSnapshot' -- \
+  'crates/rsi-optimize/src/lib.rs'; then
   printf '%s\n' \
     'verification type gate: rsi-optimize::analyze must require VerifiedSnapshot' >&2
   violations=1
