@@ -1,0 +1,15 @@
+[package]
+name = "rsi-journal"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+rsi-schema = { path = "../rsi-schema" }
+rsi-verify = { path = "../rsi-verify" }
+serde.workspace = true
+
+[dev-dependencies]
+chrono.workspace = true
+serde_json.workspace = true

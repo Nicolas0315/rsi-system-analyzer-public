@@ -1,0 +1,12 @@
+/target/
+/.idea/
+/.vscode/
+*.profraw
+*.log
+*.jsonl
+/snapshots/
+/fleet-output/
+/.rsi/
+/knowledge-cache/
+.env
+.env.*

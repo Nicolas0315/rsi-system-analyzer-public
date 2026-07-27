@@ -1,0 +1,17 @@
+[package]
+name = "rsi-ai"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+rsi-schema = { path = "../rsi-schema" }
+rsi-verify = { path = "../rsi-verify" }
+serde.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+chrono.workspace = true
+rsi-optimize = { path = "../rsi-optimize" }
+serde_json.workspace = true

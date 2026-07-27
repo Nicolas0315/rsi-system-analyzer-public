@@ -1,0 +1,28 @@
+[package]
+name = "rsi-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "rsi-scan"
+path = "src/main.rs"
+
+[dependencies]
+clap.workspace = true
+rsi-ai = { path = "../rsi-ai" }
+rsi-collect = { path = "../rsi-collect" }
+rsi-fleet = { path = "../rsi-fleet" }
+rsi-journal = { path = "../rsi-journal" }
+rsi-knowledge = { path = "../rsi-knowledge" }
+rsi-optimize = { path = "../rsi-optimize" }
+rsi-schema = { path = "../rsi-schema" }
+rsi-verify = { path = "../rsi-verify" }
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+assert_cmd.workspace = true
+predicates.workspace = true
+tempfile.workspace = true

@@ -1,0 +1,15 @@
+[package]
+name = "rsi-collect"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+chrono.workspace = true
+regex.workspace = true
+rsi-probe = { path = "../rsi-probe" }
+rsi-schema = { path = "../rsi-schema" }
+serde_json.workspace = true
+sysinfo.workspace = true
+uuid.workspace = true

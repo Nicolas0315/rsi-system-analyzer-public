@@ -1,0 +1,8 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Generated build and explicit local analysis artifacts are not release inputs."
+paths = [
+  '''(^|[\\/])target[\\/]''',
+]

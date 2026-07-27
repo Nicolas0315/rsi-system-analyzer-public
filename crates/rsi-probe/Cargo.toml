@@ -1,0 +1,16 @@
+[package]
+name = "rsi-probe"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+command-group.workspace = true
+rsi-schema = { path = "../rsi-schema" }
+sha2.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+sysinfo.workspace = true
+tempfile.workspace = true

@@ -1,0 +1,37 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/rsi-schema",
+  "crates/rsi-probe",
+  "crates/rsi-collect",
+  "crates/rsi-verify",
+  "crates/rsi-optimize",
+  "crates/rsi-knowledge",
+  "crates/rsi-journal",
+  "crates/rsi-cli",
+  "crates/rsi-ai",
+  "crates/rsi-fleet",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+rust-version = "1.96"
+
+[workspace.dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+clap = { version = "4.6.4", features = ["derive"] }
+command-group = "5.0.1"
+regex = "1.13.1"
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "rustls"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+sysinfo = "0.39.6"
+thiserror = "2.0.19"
+uuid = { version = "1", features = ["serde", "v4"] }
+
+assert_cmd = "2"
+predicates = "3"
+tempfile = "3"
