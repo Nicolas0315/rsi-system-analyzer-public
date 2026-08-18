@@ -294,6 +294,15 @@ mod tests {
         assert_process_terminated(&pid_file);
     }
 
+    // PowerShell has to cold-start, launch a second PowerShell and write the child's id
+    // before the runner's clock runs out; two seconds covered that on a developer machine
+    // and not on a loaded CI runner, where both Windows tests raced the setup and panicked
+    // reading a pid file that was never written. The budget is generous because what is
+    // under test is that the timeout fires and the descendant dies, not how fast the shell
+    // starts. The unix pair stays at 250ms -- sh has nothing to load.
+    #[cfg(windows)]
+    const WINDOWS_SETUP_BUDGET_MS: u64 = 15_000;
+
     #[cfg(windows)]
     #[test]
     fn timeout_terminates_descendant_process_tree() {
@@ -311,12 +320,18 @@ mod tests {
         let result = Runner.run_program(
             "powershell.exe",
             &["-NoProfile", "-NonInteractive", "-Command", &script],
-            2_000,
+            WINDOWS_SETUP_BUDGET_MS,
             1_024,
             true,
         );
-        assert_eq!(result, Err(ProbeError::Timeout { limit_ms: 2_000 }));
-        assert!(started.elapsed() < Duration::from_secs(5));
+        assert_eq!(
+            result,
+            Err(ProbeError::Timeout {
+                limit_ms: WINDOWS_SETUP_BUDGET_MS
+            })
+        );
+        // Still a promptness check: the kill must follow the deadline, not trail it.
+        assert!(started.elapsed() < Duration::from_millis(WINDOWS_SETUP_BUDGET_MS + 5_000));
         assert_process_terminated(&pid_file);
     }
 
@@ -335,17 +350,24 @@ mod tests {
         let result = Runner.run_program(
             "powershell.exe",
             &["-NoProfile", "-NonInteractive", "-Command", &script],
-            2_000,
+            WINDOWS_SETUP_BUDGET_MS,
             1_024,
             true,
         );
-        assert_eq!(result, Err(ProbeError::Timeout { limit_ms: 2_000 }));
+        assert_eq!(
+            result,
+            Err(ProbeError::Timeout {
+                limit_ms: WINDOWS_SETUP_BUDGET_MS
+            })
+        );
         assert_process_terminated(&pid_file);
     }
 
     fn assert_process_terminated(pid_file: &std::path::Path) {
+        // A missing file means the script never reached the line that writes it, so the
+        // run proved nothing about termination. Say that, rather than panicking on unwrap.
         let pid = fs::read_to_string(pid_file)
-            .unwrap()
+            .expect("child pid was never recorded; the setup did not finish before the timeout")
             .trim()
             .parse::<u32>()
             .unwrap();
