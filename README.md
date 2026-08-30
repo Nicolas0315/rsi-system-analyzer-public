@@ -88,3 +88,9 @@ V1 improves its proposal rules through reviewed source changes and fixtures.
 It does not rewrite its running binary or execute AI-generated commands.
 Deterministic findings, regression tests, a different-engine review, and
 operator approval are required before a proposed rule is promoted.
+
+- [Documentation](docs/)
+
+- [License](LICENSE)
+
+- [Repository hygiene](.gitignore)
